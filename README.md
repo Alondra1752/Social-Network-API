@@ -22,12 +22,12 @@ Steps to Install
 - Clone the Repository
 - Install the Dependencies 
 
-![alt text](image.png)
+![alt text](assets/images/image.png)
 
 - Set up Environment Variables
 - Start the Server by entering the command below: 
 
-![alt text](image-1.png)
+![alt text](assets/images/image-1.png)
 
 ## Usage and Testing 
 
@@ -55,14 +55,19 @@ Testing
 
 ## Links
 
-Repository Link: 
+Repository Link: https://github.com/Alondra1752/Social-Network-API
 
-Video Link: 
+### Video Demonstration
+
+You can watch a demonstration of the Social Network API: 
+
+https://drive.google.com/file/d/1rL879Bp0fwsv_OJlNaJ9f2wgglAIL6EN/view?usp=sharing
+
 
 ## License 
 This project is licensed under MIT License. For more information please click on the badge below: 
 
  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
- 
+
     
