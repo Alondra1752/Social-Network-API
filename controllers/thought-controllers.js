@@ -1,53 +1,100 @@
-const { Thought } = require('../models');
+// controllers/thought-controller.js
+const { Thought, User } = require('../models');
 
 module.exports = {
-  getAllThoughts(req, res) {
-    Thought.find()
-      .then(thoughts => res.json(thoughts))
-      .catch(err => res.status(500).json({error: err.message }));
+  // GET all thoughts
+  async getThoughts(req, res) {
+    try {
+      const thoughts = await Thought.find();
+      res.json(thoughts);
+    } catch (err) {
+      res.status(500).json(err);
+    }
   },
 
-  getThoughtById(req, res) {
-    Thought.findById(req.params.thoughtId)
-      .then(thought => res.json(thought))
-      .catch(err => res.status(500).json({error: err.message }));
+  // GET a single thought by ID
+  async getThoughtById(req, res) {
+    try {
+      const thought = await Thought.findById(req.params.thoughtId);
+      if (!thought) {
+        return res.status(404).json({ message: 'Thought not found' });
+      }
+      res.json(thought);
+    } catch (err) {
+      res.status(500).json(err);
+    }
   },
 
-  createThought(req, res) {
-    Thought.create(req.body)
-      .then(thought => res.json(thought))
-      .catch(err => res.status(500).json({error: err.message }));
+  // POST a new thought
+  async createThought(req, res) {
+    try {
+      const thought = await Thought.create(req.body);
+      await User.findByIdAndUpdate(req.body.userId, { $push: { thoughts: thought._id } });
+      res.status(201).json(thought);
+    } catch (err) {
+      res.status(500).json(err);
+    }
   },
 
-  updateThought(req, res) {
-    Thought.findByIdAndUpdate(req.params.thoughtId, req.body, { new: true })
-      .then(thought => res.json(thought))
-      .catch(err => res.status(500).json({error: err.mesage}));
+  // PUT to update a thought by ID
+  async updateThought(req, res) {
+    try {
+      const thought = await Thought.findByIdAndUpdate(req.params.thoughtId, req.body, { new: true });
+      if (!thought) {
+        return res.status(404).json({ message: 'Thought not found' });
+      }
+      res.json(thought);
+    } catch (err) {
+      res.status(500).json(err);
+    }
   },
 
-  deleteThought(req, res) {
-    Thought.findByIdAndDelete(req.params.thoughtId)
-      .then(() => res.json({ message: 'Thought deleted!' }))
-      .catch(err => res.status(500).json({error: err.message}));
+  // DELETE a thought by ID
+  async deleteThought(req, res) {
+    try {
+      const thought = await Thought.findByIdAndDelete(req.params.thoughtId);
+      if (!thought) {
+        return res.status(404).json({ message: 'Thought not found' });
+      }
+      await User.updateMany({ thoughts: req.params.thoughtId }, { $pull: { thoughts: req.params.thoughtId } });
+      res.json({ message: 'Thought deleted' });
+    } catch (err) {
+      res.status(500).json(err);
+    }
   },
 
-  addReaction(req, res) {
-    Thought.findByIdAndUpdate(
-      req.params.thoughtId,
-      { $addToSet: { reactions: req.body } },
-      { new: true }
-    )
-    .then(thought => res.json(thought))
-    .catch(err => res.status(500).json({error: err.message}));
+  // POST to create a reaction
+  async addReaction(req, res) {
+    try {
+      const thought = await Thought.findByIdAndUpdate(
+        req.params.thoughtId,
+        { $push: { reactions: req.body } },
+        { new: true }
+      );
+      if (!thought) {
+        return res.status(404).json({ message: 'Thought not found' });
+      }
+      res.json(thought);
+    } catch (err) {
+      res.status(500).json(err);
+    }
   },
 
-  removeReaction(req, res) {
-    Thought.findByIdAndUpdate(
-      req.params.thoughtId,
-      { $pull: { reactions: { reactionId: req.params.reactionId } } },
-      { new: true }
-    )
-    .then(thought => res.json(thought))
-    .catch(err => res.status(500).json({error: err.message}));
-  }
+  // DELETE to remove a reaction
+  async removeReaction(req, res) {
+    try {
+      const thought = await Thought.findByIdAndUpdate(
+        req.params.thoughtId,
+        { $pull: { reactions: { reactionId: req.params.reactionId } } },
+        { new: true }
+      );
+      if (!thought) {
+        return res.status(404).json({ message: 'Thought not found' });
+      }
+      res.json(thought);
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  },
 };
+
